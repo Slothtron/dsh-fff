@@ -1,0 +1,12 @@
+# dsh-fff bundle for DeepSeek Harness (dsh).
+# Inserted into the profile's composition when this bundle is installed
+# (`dsh plugin --profile <name> add ./dsh-fff`). The plugin row resolves the
+# package by name through the profile's node_modules. The plugin registers the
+# fffind / ffgrep model tools backed by a resident fff index that follows the
+# current session workspace (exec.agent.session.header.cwd).
+- insert:
+    - id: fff-tools
+      name: 'dsh-fff'
+      config:
+        scanTimeoutMs: 30000
+        toolCallTimeoutMs: 30000

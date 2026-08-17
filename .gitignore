@@ -1,0 +1,9 @@
+# Dependencies
+node_modules/
+
+# npm-generated lockfile (the profile installs this bundle via pnpm)
+package-lock.json
+
+# Editor / OS
+.DS_Store
+*.log
