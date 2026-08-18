@@ -10,3 +10,6 @@
       config:
         scanTimeoutMs: 30000
         toolCallTimeoutMs: 30000
+        # Static fallback for the watch mode; the web settings card can flip
+        # it live at runtime (a change rebuilds the resident index).
+        enableWatch: false

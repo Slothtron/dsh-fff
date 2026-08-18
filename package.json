@@ -1,27 +1,38 @@
 {
   "name": "@slothtron/dsh-fff",
-  "version": "0.1.0",
-  "description": "FFF (Fast File Finder) tools for DeepSeek Harness — fffind (fuzzy path search) and ffgrep (content grep) backed by a resident @ff-labs/fff-node index that follows the current session workspace.",
+  "version": "0.2.0",
+  "description": "FFF (Fast File Finder) tools for DeepSeek Harness — fffind (fuzzy path search) and ffgrep (content grep) backed by a resident @ff-labs/fff-node index that follows the current session workspace, with a runtime watch toggle on the web settings page.",
   "type": "module",
   "main": "lib/index.js",
   "exports": {
-    ".": {
-      "default": "./lib/index.js"
-    }
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
   },
   "files": [
-    "lib/index.js",
-    "lib/finder.js",
-    "lib/fff-server.mjs",
+    "lib",
+    "src",
+    "scripts",
     "cordis.patch.yml",
     "README.md"
   ],
-  "dsh": {
-    "bundle": {
-      "patch": "./cordis.patch.yml"
-    }
+  "scripts": {
+    "build": "node scripts/build.mjs"
   },
   "dependencies": {
     "@ff-labs/fff-node": "^0.10.3"
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [
+        "@deepseek-ai/dsh-client-runtime",
+        "@deepseek-ai/dsh-client-ui-slots",
+        "@deepseek-ai/dsh-client-ui-settings"
+      ],
+      "platform": "web"
+    }
   }
 }

@@ -6,12 +6,24 @@ FFF (Fast File Finder) tools for DeepSeek Harness. Registers `fffind` (fuzzy fil
 
 ```sh
 dsh plugin --profile <name> add ./dsh-fff
+# or from git:
+dsh plugin --profile <name> add github:Slothtron/dsh-fff
 # restart dsh web for the bundle layer to activate
 ```
 
 This links the bundle into the profile's `node_modules`, appends it to `dsh.profile.bundles`, and inserts the `fff-tools` plugin row. Remove with `dsh plugin --profile <name> remove @slothtron/dsh-fff`.
 
-The bundle declares `@ff-labs/fff-node` as a dependency, so pnpm installs the platform native binary (`@ff-labs/fff-bin-<platform>`) alongside.
+The bundle declares `@ff-labs/fff-node` as a dependency, so pnpm installs the platform native binary (`@ff-labs/fff-bin-<platform>`) alongside. Everything else — `@deepseek-ai/schemastery` for the settings schema, and the browser-half externals — resolves from the DSH installation's `profiles/node_modules` fallback at runtime, so the plugin ships with **zero additional npm dependencies** beyond the native fff SDK.
+
+## Build (browser half)
+
+The Host half is plain ESM JavaScript (`lib/*.js`), no build step. The browser half (`src/client/*`) is bundled once with esbuild and committed as `lib/client.js`:
+
+```sh
+node scripts/build.mjs   # esbuild is resolved from the DSH checkout ($DSH_SOURCE or ~/.dsh/source/current)
+```
+
+`lib/client.js` is a build artifact committed to git, so a git install needs no `prepare` script or build allowlisting.
 
 ## How it works
 
@@ -38,6 +50,24 @@ The `fff-tools` row accepts these keys (all optional):
 | `scanTimeoutMs` | `30000` | Wait budget for an index scan / reindex |
 | `toolCallTimeoutMs` | `30000` | RPC timeout per tool call |
 | `serverPath` | packaged copy | Absolute path to the helper script |
+| `enableWatch` | `false` | Static fallback for the background file watcher; the web settings card flips it live at runtime |
+
+## Watch toggle (runtime settings)
+
+The bundle ships a browser half (the `dsh.client` entry) that registers a card
+in the web **Settings → Plugins** tab. The card's switch flips the helper's
+background file watcher without a restart: the Host half exposes the `dsh-fff`
+settings namespace, and a change calls `reconfigure`, which destroys the
+resident index and rebuilds it with the new watch mode on the next search.
+
+- **On** — the index reflects filesystem changes (create/edit/delete) live.
+- **Off** (default) — snapshot semantics: the index updates only when the
+  session workspace switches (a reindex), not on in-workspace edits.
+
+A deployment without a settings provider (or with the browser half absent)
+keeps the `enableWatch` composition value, so the switch is additive and never
+required.
+
 
 ## Model Experience
 
@@ -59,4 +89,4 @@ The tool-catalog prefix is stable while the plugin is loaded; no per-request dyn
 
 - **Concurrent sessions share one index root.** The resident helper holds a single `FileFinder`; when two sessions in different workspaces interleave calls, each call reindexes to its own workspace (correct but pays the reindex cost on each switch). A per-session cache or the `agent/session-start` warm-up is future work.
 - **Native binary platform coverage** is whatever `@ff-labs/fff-node` ships; an unsupported platform surfaces a clear tool error.
-- **No background file watcher** (`disableWatch: true`): the index reflects the state at last reindex, not live filesystem changes. Reindex happens per workspace switch; within one workspace, files edited after indexing are picked up on the next reindex.
+- **Watcher off by default** (`enableWatch: false`). When off, the index reflects the state at last reindex, not live filesystem changes; within one workspace, files edited after indexing are picked up on the next reindex. When on, a switch in the settings card rebuilds the index live, but each watched finder adds a background thread and OS watch handle (see the refactor plan for the multi-finder pool that would make per-workspace watch cheaper).

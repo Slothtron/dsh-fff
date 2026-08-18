@@ -3,6 +3,8 @@ node_modules/
 
 # npm-generated lockfile (the profile installs this bundle via pnpm)
 package-lock.json
+pnpm-lock.yaml
+pnpm-workspace.yaml
 
 # Editor / OS
 .DS_Store
