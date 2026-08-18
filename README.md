@@ -1,4 +1,4 @@
-# dsh-fff
+# @slothtron/dsh-fff
 
 FFF (Fast File Finder) tools for DeepSeek Harness. Registers `fffind` (fuzzy file-path search / glob) and `ffgrep` (content grep) as model tools, backed by a resident [`@ff-labs/fff-node`](https://github.com/dmtrKovalenko/fff) index whose root **follows the current session workspace**.
 
@@ -9,7 +9,7 @@ dsh plugin --profile <name> add ./dsh-fff
 # restart dsh web for the bundle layer to activate
 ```
 
-This links the bundle into the profile's `node_modules`, appends it to `dsh.profile.bundles`, and inserts the `fff-tools` plugin row. Remove with `dsh plugin --profile <name> remove dsh-fff`.
+This links the bundle into the profile's `node_modules`, appends it to `dsh.profile.bundles`, and inserts the `fff-tools` plugin row. Remove with `dsh plugin --profile <name> remove @slothtron/dsh-fff`.
 
 The bundle declares `@ff-labs/fff-node` as a dependency, so pnpm installs the platform native binary (`@ff-labs/fff-bin-<platform>`) alongside.
 

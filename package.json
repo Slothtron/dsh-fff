@@ -1,5 +1,5 @@
 {
-  "name": "dsh-fff",
+  "name": "@slothtron/dsh-fff",
   "version": "0.1.0",
   "description": "FFF (Fast File Finder) tools for DeepSeek Harness — fffind (fuzzy path search) and ffgrep (content grep) backed by a resident @ff-labs/fff-node index that follows the current session workspace.",
   "type": "module",
