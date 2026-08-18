@@ -85,6 +85,15 @@ Fixed: two tool definitions are always registered while the plugin is loaded; th
 
 The tool-catalog prefix is stable while the plugin is loaded; no per-request dynamic content is injected into the prompt.
 
+## UI presentation (search cards)
+
+Both tools declare the dsh render-intent system (`presentCall` / `presentationMeta` / `presentResult`, per `docs/cookbook/adding-a-tool.md`), so a capable UI renders a **search card** instead of a generic text card:
+
+- `fffind` → `card: 'search'`, `shape: 'paths'` (flat path list, `truncated`/`total` signal).
+- `ffgrep` → `card: 'search'`, `shape: 'matches'` (matches grouped by file, expandable per-file groups).
+
+`presentationMeta` is a pure, byte-bounded projection (capped at 32 KB) persisted with the session log, so the card reproduces on replay without persisting the canonical value; malformed or absent metadata falls back to the generic card. The model-facing text (`output.render`) is unchanged.
+
 ## Known Limitations and Deferred Work
 
 - **Concurrent sessions share one index root.** The resident helper holds a single `FileFinder`; when two sessions in different workspaces interleave calls, each call reindexes to its own workspace (correct but pays the reindex cost on each switch). A per-session cache or the `agent/session-start` warm-up is future work.
